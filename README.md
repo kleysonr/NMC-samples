@@ -21,14 +21,14 @@ Download the project and upload it into the Pentaho BA Server.
 Samples available
 -------------
 
-#### <i class="icon-file">**Tips**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mouseover and click events over shapes and markers.
+- **Tips** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Mouseover and click events over shapes and markers.
 
-#### <i class="icon-file">**Shapes and Markers**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map with shapes and markers at the same time.
+- **Shapes and Markers** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Map with shapes and markers at the same time.
 
-#### <i class="icon-file">**Heatmap**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A Heatmap sample.
+- **Heatmap** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A Heatmap sample.
 
-#### <i class="icon-file">**Features load time**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Measuring the time to load features on the map.
+- **Features load time**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Measuring the time to load features on the map.
 
-#### <i class="icon-file">**Custom Tooltip**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A custom tooltip over shapes.
+- **Custom Tooltip** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A custom tooltip over shapes.
 
-#### <i class="icon-file">**Custom Feature Attribute - FillColor**</i>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A customized function to set a different color for the feature.
+- **Custom Feature Attribute - FillColor** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A customized function to set a different color for the feature.
