@@ -1,0 +1,583 @@
+{
+ "components": {
+  "rows": [
+   {
+    "id": "CUSTOMCOMPONENTS",
+    "name": "Custom",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "Custom"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "75e6cb0b-dc20-9082-39a7-cb8634a0b046",
+    "parent": "CUSTOMCOMPONENTS",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "map"
+     },
+     {
+      "name": "parameter",
+      "type": "Parameter",
+      "value": ""
+     },
+     {
+      "name": "listeners",
+      "type": "Listeners",
+      "value": "[]"
+     },
+     {
+      "name": "API_KEY",
+      "type": "String",
+      "value": "0"
+     },
+     {
+      "name": "centerLatitude",
+      "type": "Float",
+      "value": "51.61933739"
+     },
+     {
+      "name": "centerLongitude",
+      "type": "Float",
+      "value": "-121.11328123"
+     },
+     {
+      "name": "cggGraphParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "colormap",
+      "type": "Array",
+      "value": "[]"
+     },
+     {
+      "name": "defaultZoomLevel",
+      "type": "Integer",
+      "value": "3"
+     },
+     {
+      "name": "fillOpacity",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "locationResolver",
+      "type": "locationResolverCustom",
+      "value": "openstreetmap"
+     },
+     {
+      "name": "mapEngineType",
+      "type": "mapEngineTypeCustom",
+      "value": "openlayers"
+     },
+     {
+      "name": "mapMode",
+      "type": "mapModeCustom",
+      "value": "markers"
+     },
+     {
+      "name": "marker",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerCggGraph",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerClickFunction",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "markerHeight",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "markerWidth",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "parameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupContentsDiv",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "popupHeight",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "popupParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupWidth",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "shapeSource",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeColor",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeWidth",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "tilesets",
+      "type": "tilesetsCustom",
+      "value": "default"
+     },
+     {
+      "name": "dataSource",
+      "type": "Datasource",
+      "value": ""
+     },
+     {
+      "name": "priority",
+      "type": "Integer",
+      "value": 5
+     },
+     {
+      "name": "htmlObject",
+      "type": "HtmlObject",
+      "value": "${h:mapObj}"
+     },
+     {
+      "name": "executeAtStart",
+      "type": "Boolean",
+      "value": "true"
+     },
+     {
+      "name": "preExecution",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "postExecution",
+      "type": "JavaScript",
+      "value": "function() {\n    \n    /*\n    * dashboard.incrementRunningCalls();\n    * dashboard.decrementRunningCalls();\n    *\n    * keep the blockUI active while loading the layer\n    *\n    */\n    \n    eventsLog = OpenLayers.Util.getElement(\"eventsLogID\");\n    \n    var getTimeStamp = function() {\n        return performance.now();\n    }\n\n    var dashboard = this.dashboard;\n    var registerEvents = function (layer, map) {\n\n        layer.logEvent = function(event) {\n            var logMsg = getTimeStamp() + \"(ms) - \" + this.name + \": \" + event\n            //console.log(logMsg);\n            eventsLog.innerHTML += \"<br>\" + logMsg;\n        };\n\n        layer.events.register(\"loadstart\", layer, function() {\n            this.logEvent(\"Load Start\");\n            dashboard.incrementRunningCalls();\n        });\n\n        layer.events.register(\"tileloaded\", layer, function() {\n            this.logEvent(\"Tile loaded. \" + this.numLoadingTiles + \" left.\");\n        });\n\n        layer.events.register(\"loadend\", layer, function() {\n            this.logEvent(\"Load End\");\n            dashboard.decrementRunningCalls();\n        });\n\n        map.addLayer(layer);\n    }    \n    \n    var vector = new OpenLayers.Layer.Vector(\"GeoJSON\", {\n        rendererOptions: {\n          zIndexing: true\n        },\n        isBaseLayer: false\n        //,minScale: 3466743.3252500976\n    });\n   \n    \n    var geoJSONParser = new OpenLayers.Format.GeoJSON({\n        ignoreExtraDims: true,\n        'internalProjection': new OpenLayers.Projection(\"EPSG:900913\"),\n        'externalProjection': new OpenLayers.Projection(\"EPSG:4326\")\n    });\n    \n    \n    var f = geoJSON;\n    var features = geoJSONParser.read(f, \"FeatureCollection\");\n    vector.addFeatures(features);\n\n    registerEvents(vector, this.mapEngine.map);\n    \n} "
+     },
+     {
+      "name": "postFetch",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "preChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "postChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "tooltip",
+      "type": "Html",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseClick",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOut",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOver",
+      "type": "JavaScript",
+      "value": ""
+     }
+    ],
+    "rowName": "NewMapComponent",
+    "type": "ComponentsNewMapComponent",
+    "typeDesc": "Map Component"
+   }
+  ]
+ },
+ "datasources": {
+  "rows": [
+   {
+    "id": "SCRIPTING",
+    "name": "SCRIPTING Queries",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "SCRIPTING Queries"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "7f64fdab-9b22-7ba4-c112-70983e78d8a2",
+    "meta": "CDA",
+    "meta_conntype": "scripting.scripting",
+    "meta_datype": "jsonScriptable",
+    "parent": "SCRIPTING",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "markersDS"
+     },
+     {
+      "name": "initscript",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "language",
+      "type": "String",
+      "value": "beanshell"
+     },
+     {
+      "name": "access",
+      "type": "Access",
+      "value": "public"
+     },
+     {
+      "name": "query",
+      "type": "JsonScriptableQuery",
+      "value": "{  \n   \"metadata\":[  \n      {\"colName\":\"Longitude\", \"colType\":\"Numeric\", \"colIndex\":0},\n      {\"colName\":\"Latitude\", \"colType\":\"Numeric\", \"colIndex\":1},\n      {\"colName\":\"id\", \"colType\":\"String\", \"colIndex\":2},\n      {\"colName\":\"fill\", \"colType\":\"Integer\", \"colIndex\":3},\n      {\"colName\":\"value\", \"colType\":\"Integer\", \"colIndex\":4}\n   ],\n   \"resultset\":[  \n      [-80.19366, 25.77427, \"Miami\", 10, 25],\n      [-97.74306, 30.267153, \"Austin\", 2, 50],\n      [-80.137314, 26.122438, \"Fort Lauderdale\", 5, 12]\n   ]\n}"
+     },
+     {
+      "name": "parameters",
+      "type": "CdaParameters",
+      "value": "[]"
+     },
+     {
+      "name": "cdacalculatedcolumns",
+      "type": "CdaCalculatedColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "cdacolumns",
+      "type": "CdaColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "output",
+      "type": "IndexArray",
+      "value": "[]"
+     },
+     {
+      "name": "outputMode",
+      "type": "OutputMode",
+      "value": "include"
+     },
+     {
+      "name": "cacheKeys",
+      "type": "CacheKeysValues",
+      "value": "[]"
+     },
+     {
+      "name": "cacheDuration",
+      "type": "Integer",
+      "value": 3600
+     },
+     {
+      "name": "cache",
+      "type": "Boolean",
+      "value": "true"
+     }
+    ],
+    "rowName": "jsonScriptable over scripting",
+    "type": "ComponentsjsonScriptable_scripting",
+    "typeDesc": "jsonScriptable over scripting"
+   }
+  ]
+ },
+ "filename": "/public/NMC-samples/load_time.cdfde",
+ "layout": {
+  "rows": [
+   {
+    "id": "2b44ea60-4134-af2b-8fb2-f5abb647275f",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "css"
+     },
+     {
+      "name": "resourceCode",
+      "type": "Resource",
+      "value": "#controls {\n    float: left;\n    text-align: right;\n}\n#eventsLogID {\n    text-align: left;\n    width: 350px;\n    height: 475px;\n    overflow: auto;\n    border: 1px solid black;\n} "
+     },
+     {
+      "name": "resourceType",
+      "type": "Label",
+      "value": "Css"
+     }
+    ],
+    "type": "LayoutResourceCode",
+    "typeDesc": "Resource"
+   },
+   {
+    "id": "1043196b-197b-1260-2345-8ea34b513c4f",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "geoJSON"
+     },
+     {
+      "name": "resourceFile",
+      "type": "ResourceFile",
+      "value": "${solution:resources/js/loadUsCounties.js}"
+     },
+     {
+      "name": "resourceType",
+      "type": "Label",
+      "value": "Javascript"
+     }
+    ],
+    "type": "LayoutResourceFile",
+    "typeDesc": "Resource"
+   },
+   {
+    "id": "3aa2f403-96ee-d90a-f743-38b406ddaf91",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "a3c824f9-d038-ba78-4875-df95b3d7295b",
+    "parent": "3aa2f403-96ee-d90a-f743-38b406ddaf91",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapObj"
+     },
+     {
+      "name": "columnSpan",
+      "type": "Integer",
+      "value": "8"
+     },
+     {
+      "name": "columnPrepend",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "columnAppend",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "columnPrependTop",
+      "type": "Boolean",
+      "value": "false"
+     },
+     {
+      "name": "columnAppendBottom",
+      "type": "Boolean",
+      "value": "false"
+     },
+     {
+      "name": "columnBorder",
+      "type": "Boolean",
+      "value": "false"
+     },
+     {
+      "name": "columnBigBorder",
+      "type": "Boolean",
+      "value": "false"
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": "500"
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "54b1470e-065a-86c1-b85a-7dcd41d2f757",
+    "parent": "3aa2f403-96ee-d90a-f743-38b406ddaf91",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "controls"
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "4"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "94a63b70-8284-67f6-7263-1efee62998a2",
+    "parent": "54b1470e-065a-86c1-b85a-7dcd41d2f757",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "html",
+      "type": "Html",
+      "value": "<div id=\"eventsLogID\">\n    <b>Events Log:</b>\n</div> "
+     },
+     {
+      "name": "fontSize",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "color",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutHtml",
+    "typeDesc": "Html"
+   }
+  ],
+  "title": "CDF - Sample structure"
+ }
+}

@@ -1,0 +1,722 @@
+{
+ "components": {
+  "rows": [
+   {
+    "id": "CUSTOMCOMPONENTS",
+    "name": "Custom",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "Custom"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "a3911345-7273-c0aa-860f-36fc3728bd36",
+    "parent": "CUSTOMCOMPONENTS",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapShapes"
+     },
+     {
+      "name": "parameter",
+      "type": "Parameter",
+      "value": ""
+     },
+     {
+      "name": "listeners",
+      "type": "Listeners",
+      "value": "[]"
+     },
+     {
+      "name": "API_KEY",
+      "type": "String",
+      "value": "0"
+     },
+     {
+      "name": "centerLatitude",
+      "type": "Float",
+      "value": "-27.888853"
+     },
+     {
+      "name": "centerLongitude",
+      "type": "Float",
+      "value": "-54.777832"
+     },
+     {
+      "name": "cggGraphParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "colormap",
+      "type": "Array",
+      "value": "[]"
+     },
+     {
+      "name": "defaultZoomLevel",
+      "type": "Integer",
+      "value": "3"
+     },
+     {
+      "name": "fillOpacity",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "locationResolver",
+      "type": "locationResolverCustom",
+      "value": "openstreetmap"
+     },
+     {
+      "name": "mapEngineType",
+      "type": "mapEngineTypeCustom",
+      "value": "openlayers"
+     },
+     {
+      "name": "mapMode",
+      "type": "mapModeCustom",
+      "value": "shapes"
+     },
+     {
+      "name": "marker",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerCggGraph",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerClickFunction",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "markerHeight",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "markerWidth",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "parameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupContentsDiv",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "popupHeight",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "popupParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupWidth",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "shapeSource",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeColor",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeWidth",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "tilesets",
+      "type": "tilesetsCustom",
+      "value": "default"
+     },
+     {
+      "name": "dataSource",
+      "type": "Datasource",
+      "value": "southAmericaDS"
+     },
+     {
+      "name": "priority",
+      "type": "Integer",
+      "value": 5
+     },
+     {
+      "name": "htmlObject",
+      "type": "HtmlObject",
+      "value": "${h:mapShapesObj}"
+     },
+     {
+      "name": "executeAtStart",
+      "type": "Boolean",
+      "value": "true"
+     },
+     {
+      "name": "preExecution",
+      "type": "JavaScript",
+      "value": "function(){\n    \n    /*\n    *\n    * Load the map definition from a GeoJSON file\n    *\n    * It's only rendered in the map those features contained in the resultset.\n    *\n    */\n    \n    var getResource = this.dashboard.getWebAppPath() + '/plugin/pentaho-cdf-dd/api/resources';\n    var mapDef = '${solution:resources/geojson/south-america.geojson.js}';\n\n    this.shapeResolver = 'geoJSON';\n    this.setAddInOptions('ShapeResolver', 'geoJSON', {\n        url: getResource + mapDef, //BA server does not recognize the .geojson extension\n        idPropertyName: 'abbrev' //GeoJSON feature property that will be used to index the feature\n    });\n    \n    /*\n    *\n    * The NMC needs to know what columns in the resultset define\n    * the id, that will be matched with the mapDefinition, and\n    * what column represent the value used to match the color.\n    *\n    * There are two ways to do that.\n    *   1 - Have two columns the in resultset called id and fill.\n    *   2 - Use the visualRoles to set which columns (base 0) represent the id and fill values.\n    *\n    */\n    \n    this.visualRoles = {\n        id: 0,\n        fill: 1\n    };\n    \n    /*\n    *\n    * Configure a handler for shape mouseover\n    *\n    */\n    \n    this.off(\"shape:mouseover\").on(\"shape:mouseover\", function(e){\n       \n        $('#popupObj').show();\n        \n    });\n\n    this.off(\"shape:mouseout\").on(\"shape:mouseout\", function(e){\n       \n        $('#popupObj').hide();\n        \n    });\n    \n    /*\n    *\n    * If defined a click event, change the cursor\n    *\n    */\n    \n    this.styleMap = {\n            shapes: {\n                cursor: \"default\"\n            }\n    };  \n\n} \n "
+     },
+     {
+      "name": "postExecution",
+      "type": "JavaScript",
+      "value": "function() {\n    \n    var me = this;\n\n    /*\n    *\n    * Define events for mouse move\n    *\n    */\n    \n    this.mapEngine.map.events.register('mousemove', this.mapEngine.map, function (e) {\n        \n        if (event.target._geometryClass == 'OpenLayers.Geometry.Polygon') {\n            \n            var layers = me.mapEngine.map.getLayersByClass(\"OpenLayers.Layer.Vector\");\n            var layer = _.find(layers, function(layer){ \n                var f = layer.getFeatureById(event.target._featureId);\n                return f != null; \n            });\n            var feature = layer.getFeatureById(event.target._featureId);\n            var modelItem = me.mapEngine.model.findWhere({id: feature.attributes.id});\n    \n            $('#popupObj').css('top', e.pageY -50).css('left', e.pageX + 5).html(modelItem.id + '(' + modelItem.attributes.data.value + ')');\n            \n        }\n    });\n\n    this.mapEngine.map.events.register('movestart', this.mapEngine.map, function (e) {\n        $('#popupObj').fadeIn(500);\n    });\n    \n    this.mapEngine.map.events.register('moveend', this.mapEngine.map, function (e) {\n        $('#popupObj').fadeOut(500);\n    });    \n    \n} "
+     },
+     {
+      "name": "postFetch",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "preChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "postChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "tooltip",
+      "type": "Html",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseClick",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOut",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOver",
+      "type": "JavaScript",
+      "value": ""
+     }
+    ],
+    "rowName": "NewMapComponent",
+    "type": "ComponentsNewMapComponent",
+    "typeDesc": "Map Component"
+   }
+  ]
+ },
+ "datasources": {
+  "rows": [
+   {
+    "id": "SCRIPTING",
+    "name": "SCRIPTING Queries",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "SCRIPTING Queries"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "eb305374-3e54-4215-a6d7-40db10eb4044",
+    "meta": "CDA",
+    "meta_conntype": "scripting.scripting",
+    "meta_datype": "jsonScriptable",
+    "parent": "SCRIPTING",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "southAmericaDS"
+     },
+     {
+      "name": "initscript",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "language",
+      "type": "String",
+      "value": "beanshell"
+     },
+     {
+      "name": "access",
+      "type": "Access",
+      "value": "public"
+     },
+     {
+      "name": "query",
+      "type": "JsonScriptableQuery",
+      "value": "{\n   \"resultset\":[\n      [\"BRA\", 10, -14.235004, -51.92528],\n      [\"PER\", 20, -9.189967, -75.015152],\n      [\"BOL\", 30, -16.290154, -63.588653],\n      [\"COL\", 15, 4.570868, -74.297333],\n      [\"VEN\", 25, 6.42375, -66.58973],\n      [\"ECU\", 50, -1.831239, -78.183406],\n      [\"GUY\", 5, 4.860416, -58.93018],\n      [\"PRY\", 10, -23.442503, -58.443832],\n      [\"SUR\", 10, 3.919305, -56.027783],\n      [\"URY\", 35, -32.522779, -55.765835],\n      [\"ARG\", 45, -38.416097, -63.616672],\n      [\"CHL\", 40, -35.675147, -71.542969]\n   ],\n\n   \"metadata\":[\n      {\"colIndex\":0,\"colType\":\"String\",\"colName\":\"abbrev\"},\n      {\"colIndex\":1,\"colType\":\"Integer\",\"colName\":\"value\"},\n      {\"colIndex\":2,\"colType\":\"Numeric\",\"colName\":\"latitude\"},\n      {\"colIndex\":3,\"colType\":\"Numeric\",\"colName\":\"longitude\"}\n   ]\n}"
+     },
+     {
+      "name": "parameters",
+      "type": "CdaParameters",
+      "value": "[]"
+     },
+     {
+      "name": "cdacalculatedcolumns",
+      "type": "CdaCalculatedColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "cdacolumns",
+      "type": "CdaColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "output",
+      "type": "IndexArray",
+      "value": "[]"
+     },
+     {
+      "name": "outputMode",
+      "type": "OutputMode",
+      "value": "include"
+     },
+     {
+      "name": "cacheKeys",
+      "type": "CacheKeysValues",
+      "value": "[]"
+     },
+     {
+      "name": "cacheDuration",
+      "type": "Integer",
+      "value": 3600
+     },
+     {
+      "name": "cache",
+      "type": "Boolean",
+      "value": "true"
+     }
+    ],
+    "rowName": "jsonScriptable over scripting",
+    "type": "ComponentsjsonScriptable_scripting",
+    "typeDesc": "jsonScriptable over scripting"
+   }
+  ]
+ },
+ "filename": "/public/NMC-samples/custom_tooltip.cdfde",
+ "layout": {
+  "rows": [
+   {
+    "id": "219341e5-43bd-06d9-d133-31cb4d2f86be",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "tooltipCSS"
+     },
+     {
+      "name": "resourceCode",
+      "type": "Resource",
+      "value": "#popupObj {\n position:absolute;\n background:white;\n z-Index:1000;\n padding:5px;\n border-radius:5px;\n border: 1px solid grey;\n display: none;\n} "
+     },
+     {
+      "name": "resourceType",
+      "type": "Label",
+      "value": "Css"
+     }
+    ],
+    "type": "LayoutResourceCode",
+    "typeDesc": "Resource"
+   },
+   {
+    "id": "7db8bc97-943d-94db-adef-0b1ab363275c",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "42c53be3-b7e9-ca25-6044-8e294c6511e2",
+    "parent": "7db8bc97-943d-94db-adef-0b1ab363275c",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "12"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "3e4bf410-624e-08a0-a506-75288b087dca",
+    "parent": "42c53be3-b7e9-ca25-6044-8e294c6511e2",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "html",
+      "type": "Html",
+      "value": "On mouse move tooltip: "
+     },
+     {
+      "name": "fontSize",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "color",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutHtml",
+    "typeDesc": "Html"
+   },
+   {
+    "id": "add4affb-f033-59a6-d0e5-36b416aa3c49",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "maps"
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "d724e93b-9375-c96d-9f2f-42e632eafd60",
+    "parent": "add4affb-f033-59a6-d0e5-36b416aa3c49",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapShapesObj"
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "12"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": "500"
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "0306d5d2-bfd4-b8a9-a29d-da30c4e7cd8c",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "popupObj"
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "77017446-6d96-c414-672a-91c5768a62ae",
+    "parent": "0306d5d2-bfd4-b8a9-a29d-da30c4e7cd8c",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "12"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "4c3cd8ab-e42c-21c0-278b-07a7cc359083",
+    "parent": "77017446-6d96-c414-672a-91c5768a62ae",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "html",
+      "type": "Html",
+      "value": "ola "
+     },
+     {
+      "name": "fontSize",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "color",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutHtml",
+    "typeDesc": "Html"
+   }
+  ],
+  "title": "CDF - Sample structure"
+ }
+}

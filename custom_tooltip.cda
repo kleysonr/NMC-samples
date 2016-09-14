@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDADescriptor>
+   <DataSources>
+      <Connection id="southAmericaDS" type="scripting.scripting">
+         <Initscript/>
+         <Language>beanshell</Language>
+      </Connection>
+   </DataSources>
+   <DataAccess access="public" connection="southAmericaDS" id="southAmericaDS"
+               type="jsonScriptable">
+      <Name>southAmericaDS</Name>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters/>
+      <Query><![CDATA[{
+   "resultset":[
+      ["BRA", 10, -14.235004, -51.92528],
+      ["PER", 20, -9.189967, -75.015152],
+      ["BOL", 30, -16.290154, -63.588653],
+      ["COL", 15, 4.570868, -74.297333],
+      ["VEN", 25, 6.42375, -66.58973],
+      ["ECU", 50, -1.831239, -78.183406],
+      ["GUY", 5, 4.860416, -58.93018],
+      ["PRY", 10, -23.442503, -58.443832],
+      ["SUR", 10, 3.919305, -56.027783],
+      ["URY", 35, -32.522779, -55.765835],
+      ["ARG", 45, -38.416097, -63.616672],
+      ["CHL", 40, -35.675147, -71.542969]
+   ],
+
+   "metadata":[
+      {"colIndex":0,"colType":"String","colName":"abbrev"},
+      {"colIndex":1,"colType":"Integer","colName":"value"},
+      {"colIndex":2,"colType":"Numeric","colName":"latitude"},
+      {"colIndex":3,"colType":"Numeric","colName":"longitude"}
+   ]
+}]]></Query>
+   </DataAccess>
+</CDADescriptor>

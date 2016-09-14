@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDADescriptor>
+   <DataSources>
+      <Connection id="markersDS" type="scripting.scripting">
+         <Initscript/>
+         <Language>beanshell</Language>
+      </Connection>
+   </DataSources>
+   <DataAccess access="public" connection="markersDS" id="markersDS" type="jsonScriptable">
+      <Name>markersDS</Name>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters/>
+      <Query><![CDATA[{  
+   "metadata":[  
+      {"colName":"Longitude", "colType":"Numeric", "colIndex":0},
+      {"colName":"Latitude", "colType":"Numeric", "colIndex":1},
+      {"colName":"id", "colType":"String", "colIndex":2},
+      {"colName":"fill", "colType":"Integer", "colIndex":3},
+      {"colName":"value", "colType":"Integer", "colIndex":4}
+   ],
+   "resultset":[  
+      [-80.19366, 25.77427, "Miami", 10, 25],
+      [-97.74306, 30.267153, "Austin", 2, 50],
+      [-80.137314, 26.122438, "Fort Lauderdale", 5, 12]
+   ]
+}]]></Query>
+   </DataAccess>
+</CDADescriptor>
