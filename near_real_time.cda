@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDADescriptor>
+   <DataSources>
+      <Connection id="mapDS" type="kettle.TransFromFile">
+         <KtrFile>resources/ktr/getLastShipPos.ktr</KtrFile>
+         <variables datarow-name="index" variable-name="index"/>
+      </Connection>
+   </DataSources>
+   <DataAccess access="public" connection="mapDS" id="mapDS" type="kettle">
+      <Name>mapDS</Name>
+      <Cache duration="3600" enabled="false"/>
+      <Columns/>
+      <Parameters>
+         <Parameter default="" name="index" type="Integer"/>
+      </Parameters>
+      <Query><![CDATA[output]]></Query>
+   </DataAccess>
+</CDADescriptor>

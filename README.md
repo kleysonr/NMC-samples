@@ -32,3 +32,5 @@ Samples available
 - **Custom Tooltip** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A custom tooltip over shapes.
 
 - **Custom Feature Attribute - FillColor** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A customized function to set a different color for the feature.
+
+- **Near Real Time** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ships moving based on new GPS location.
