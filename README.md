@@ -16,7 +16,7 @@ How to install
 
 Download the project and upload it into the Pentaho BA Server.
 
-Make sure that you have the following path on the Browser Files: /Public/NMC-Samples
+Make sure that you have the following path on the Browser Files: /Public/NMC-samples
 
 ----------
 
