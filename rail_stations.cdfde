@@ -1,0 +1,727 @@
+{
+ "components": {
+  "rows": [
+   {
+    "id": "CUSTOMCOMPONENTS",
+    "name": "Custom",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "Custom"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "a3911345-7273-c0aa-860f-36fc3728bd36",
+    "parent": "CUSTOMCOMPONENTS",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapDyn"
+     },
+     {
+      "name": "parameter",
+      "type": "Parameter",
+      "value": ""
+     },
+     {
+      "name": "listeners",
+      "type": "Listeners",
+      "value": "[]"
+     },
+     {
+      "name": "API_KEY",
+      "type": "String",
+      "value": "0"
+     },
+     {
+      "name": "centerLatitude",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "centerLongitude",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "cggGraphParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "colormap",
+      "type": "Array",
+      "value": "[]"
+     },
+     {
+      "name": "defaultZoomLevel",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "fillOpacity",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "locationResolver",
+      "type": "locationResolverCustom",
+      "value": "openstreetmap"
+     },
+     {
+      "name": "mapEngineType",
+      "type": "mapEngineTypeCustom",
+      "value": "openlayers"
+     },
+     {
+      "name": "mapMode",
+      "type": "mapModeCustom",
+      "value": "markers"
+     },
+     {
+      "name": "marker",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerCggGraph",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerClickFunction",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "markerHeight",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "markerWidth",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "parameters",
+      "type": "ValuesArray",
+      "value": "[[\"index\",\"index\"]]"
+     },
+     {
+      "name": "popupContentsDiv",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "popupHeight",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "popupParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupWidth",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "shapeSource",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeColor",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeWidth",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "tilesets",
+      "type": "tilesetsCustom",
+      "value": "default"
+     },
+     {
+      "name": "dataSource",
+      "type": "Datasource",
+      "value": "stationDS"
+     },
+     {
+      "name": "priority",
+      "type": "Integer",
+      "value": 5
+     },
+     {
+      "name": "htmlObject",
+      "type": "HtmlObject",
+      "value": "${h:mapDynObj}"
+     },
+     {
+      "name": "executeAtStart",
+      "type": "Boolean",
+      "value": "true"
+     },
+     {
+      "name": "preExecution",
+      "type": "JavaScript",
+      "value": "function() {\n\n    /*\n    * Set the markers styles\n    *\n    */\n    this.styleMap = {\n        markers: {\n            fill: \"white\",\n            strokeColor: \"black\",\n            strokeWidth: 2,\n            \"fill-opacity\": 1,\n            r: 7,\n            disabled: {\n                unselected: {\n                    \"fill-opacity\": 1\n                },\n                hover: {\n                    fill: \"red\",\n                    \"fill-opacity\": 1,\n                    strokeColor: \"red\",\n                    cursor: \"default\"\n                }\n            }\n        }\n    };  \n    \n    /*\n    *\n    * Configure a handler for shape mouseover\n    *\n    */\n    \n    this.off(\"marker:mouseover\").on(\"marker:mouseover\", function(e){\n       \n        $('#popupObj').show();\n        this.currentFeatureOver = e;\n        \n    });\n\n    this.off(\"marker:mouseout\").on(\"marker:mouseout\", function(e){\n       \n        $('#popupObj').hide();\n        this.currentFeatureOver = null;\n        \n    });    \n    \n} "
+     },
+     {
+      "name": "postExecution",
+      "type": "JavaScript",
+      "value": "// RAIL STATION\n\nfunction() {\n\n    var myself = this;\n  \n    var layersControl = {};\n    var features = new Array();\n    \n    // Convert the Lat/Lng point from GPS to the map's projection\n    var convertPoint = function(lat, lng) {\n        \n        var fromProjection = new OpenLayers.Projection(\"EPSG:4326\");   // Transform from WGS 1984\n        var toProjection   = new OpenLayers.Projection(\"EPSG:900913\"); // to Spherical Mercator Projection\n    \n        // Create a lonlat instance and transform it to the map projection.\n        var lonlat = new OpenLayers.LonLat(lng, lat);\n        lonlat.transform(fromProjection, toProjection);\n    \n        return lonlat;\n    }\n    \n    // Draw track route\n    var addRoute = function(layer, latSrc, lngSrc, latDst, lngDst, attributes) {\n      \n        var points = new Array(\n                new OpenLayers.Geometry.Point(lngSrc, latSrc),\n                new OpenLayers.Geometry.Point(lngDst, latDst)\n            );\n        var line = new OpenLayers.Geometry.LineString(points);\n        var lineFeature = new OpenLayers.Feature.Vector(line, null, { \n                strokeColor: 'red', \n                strokeWidth: 2,\n                strokeDashstyle: 'solid',\n                zIndex: 0\n            });\n        \n        lineFeature.attributes = attributes;\n        \n        features.push(lineFeature);\n      \n    }\n    \n    // All the data in the resultset become feature attributes\n    var getFeaturesAttrs = function(headers, row) {\n      \n      var attrObj = {};\n      \n      for(j = 0; j < headers.length; j++) {\n        \n          attrObj[headers[j].colName] = row[headers[j].colIndex];\n        \n      }\n      \n      return attrObj;\n      \n    }\n    \n    // Create/update markers\n    var updateMap = function(mapEngine, data, layersControl) {\n\n        // Create a new vector layer for the routes features\n        var vector = new OpenLayers.Layer.Vector(\"Routes\", {\n            rendererOptions: {\n              zIndexing: true\n            },\n            isBaseLayer: false\n        });\n        layersControl['layer'] = vector;\n\n        // Get indexes for id, lat, lng\n        var idIdx  = _.find(data.metadata, function(item) { return (item.colName == 'id') });\n        var latIdx = _.find(data.metadata, function(item) { return (item.colName == 'latitude') });\n        var lngIdx = _.find(data.metadata, function(item) { return (item.colName == 'longitude') });\n\n        for (i = 0; i < data.queryInfo.totalRows; i++) {\n\n          var featureId = data.resultset[i][idIdx.colIndex];\n\n          // Get new Lat/Lng\n          var featureLat = data.resultset[i][latIdx.colIndex];\n          var featureLng = data.resultset[i][lngIdx.colIndex];\n\n          var lonlat = convertPoint(featureLat, featureLng);\n\n          var point = new OpenLayers.Geometry.Point(lonlat.lon, lonlat.lat);\n            \n          var attributes = getFeaturesAttrs(data.metadata, data.resultset[i]);\n\n          if ( layersControl['lastPoint'] != undefined ) \n          {\n              var oldLng = layersControl['lastPoint'].x;\n              var oldLat = layersControl['lastPoint'].y;\n\n              var lonlat = convertPoint(featureLat, featureLng);\n\n              addRoute(layersControl['layer'], oldLat, oldLng, lonlat.lat, lonlat.lon, attributes);\n          }\n\n          layersControl['lastPoint'] = point;\n\n        }\n\n        vector.addFeatures(features);\n        \n        mapEngine.map.addLayer(vector);\n        \n    }\n    \n    updateMap(myself.mapEngine, myself.metadata.data, layersControl);\n    \n    /*\n    *\n    * Define events for mouse move\n    *\n    */\n    \n    this.mapEngine.map.events.register('mousemove', this.mapEngine.map, function (e) {\n        \n        if (!_.isEmpty(myself.currentFeatureOver)) {\n           \n            var modelItem = myself.mapEngine.model.findWhere({id: myself.currentFeatureOver.id});\n   \n            $('#popupObj').css('top', e.pageY -60).css('left', e.pageX + 15).html(modelItem.id + '</br>Loading ' + modelItem.attributes.data.loading + '%');\n           \n        }\n        \n    });\n\n    this.mapEngine.map.events.register('movestart', this.mapEngine.map, function (e) {\n        if (!_.isEmpty(myself.currentFeatureOver)) {\n            $('#popupObj').fadeIn(500);\n        }\n    });\n    \n    this.mapEngine.map.events.register('moveend', this.mapEngine.map, function (e) {\n        if (!_.isEmpty(myself.currentFeatureOver)) {\n            $('#popupObj').fadeOut(500);\n        }\n    });    \n      \n} "
+     },
+     {
+      "name": "postFetch",
+      "type": "JavaScript",
+      "value": "function(data) {\n\n    // Save the resultSet in the component context to be used later\n    this.metadata = {}\n    this.metadata.data = data;\n    \n} "
+     },
+     {
+      "name": "preChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "postChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "tooltip",
+      "type": "Html",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseClick",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOut",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOver",
+      "type": "JavaScript",
+      "value": ""
+     }
+    ],
+    "rowName": "NewMapComponent",
+    "type": "ComponentsNewMapComponent",
+    "typeDesc": "Map Component"
+   },
+   {
+    "id": "GENERIC",
+    "name": "Generic",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "Generic"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "7d3ee50a-3a30-2678-d343-e50f32f6693e",
+    "parent": "GENERIC",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "index"
+     },
+     {
+      "name": "propertyValue",
+      "type": "String",
+      "value": "1"
+     },
+     {
+      "name": "parameterViewRole",
+      "type": "parameterViewRoleCustom",
+      "value": "unused"
+     },
+     {
+      "name": "bookmarkable",
+      "type": "Boolean",
+      "value": "false"
+     },
+     {
+      "name": "public",
+      "type": "Boolean",
+      "value": "false"
+     }
+    ],
+    "rowName": "Simple Parameter",
+    "type": "ComponentsParameter",
+    "typeDesc": "Simple parameter"
+   }
+  ]
+ },
+ "datasources": {
+  "rows": [
+   {
+    "id": "KETTLE",
+    "name": "KETTLE Queries",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "KETTLE Queries"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "40762332-6914-7c66-525b-b37f1b68a966",
+    "meta": "CDA",
+    "meta_conntype": "kettle.TransFromFile",
+    "meta_datype": "kettle",
+    "parent": "KETTLE",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapDS"
+     },
+     {
+      "name": "ktrFile",
+      "type": "KtrPath",
+      "value": "resources/ktr/getLastShipPos.ktr"
+     },
+     {
+      "name": "access",
+      "type": "Access",
+      "value": "public"
+     },
+     {
+      "name": "query",
+      "type": "DefaultQuery",
+      "value": "output"
+     },
+     {
+      "name": "parameters",
+      "type": "CdaParameters",
+      "value": "[[\"index\",\"\",\"Integer\",\"\",\"\"]]"
+     },
+     {
+      "name": "variables",
+      "type": "VariablesValues",
+      "value": "[[\"index\",\"index\"]]"
+     },
+     {
+      "name": "cdacalculatedcolumns",
+      "type": "CdaCalculatedColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "cdacolumns",
+      "type": "CdaColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "output",
+      "type": "IndexArray",
+      "value": "[]"
+     },
+     {
+      "name": "outputMode",
+      "type": "OutputMode",
+      "value": "include"
+     },
+     {
+      "name": "cacheKeys",
+      "type": "CacheKeysValues",
+      "value": "[]"
+     },
+     {
+      "name": "cacheDuration",
+      "type": "Integer",
+      "value": 3600
+     },
+     {
+      "name": "cache",
+      "type": "Boolean",
+      "value": "false"
+     }
+    ],
+    "rowName": "kettle over kettleTransFromFile",
+    "type": "Componentskettle_kettleTransFromFile",
+    "typeDesc": "kettle over kettleTransFromFile"
+   },
+   {
+    "id": "SCRIPTING",
+    "name": "SCRIPTING Queries",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "SCRIPTING Queries"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "2db3041d-245b-e36a-9510-af0d16de649e",
+    "meta": "CDA",
+    "meta_conntype": "scripting.scripting",
+    "meta_datype": "jsonScriptable",
+    "parent": "SCRIPTING",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "stationDS"
+     },
+     {
+      "name": "initscript",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "language",
+      "type": "String",
+      "value": "beanshell"
+     },
+     {
+      "name": "access",
+      "type": "Access",
+      "value": "public"
+     },
+     {
+      "name": "query",
+      "type": "JsonScriptableQuery",
+      "value": "{\n   \"resultset\":[\n        [\"station1\", 51.500942, -0.126343, 10, \"\"],\t\n        [\"station2\", 51.432501, -1.203003, 50, \"ok\"],\n        [\"station3\", 51.226560, -2.246704, 30, \"ok\"],\n        [\"station4\", 51.095653, -2.713623, 40, \"late\"],\n        [\"station5\", 50.988584, -3.004761, 90, \"late\"],\n        [\"station6\", 50.888199, -3.043213, 95, \"late\"],\n        [\"station7\", 50.891665, -3.218994, 100, \"ok\"],\n        [\"station8\", 50.818842, -3.268433, 15, \"late\"]    \n   ],\n\n   \"metadata\":[\n        {\"colIndex\":0,\"colType\":\"String\",\"colName\":\"id\"},\n        {\"colIndex\":1,\"colType\":\"Numeric\",\"colName\":\"latitude\"},\n        {\"colIndex\":2,\"colType\":\"Numeric\",\"colName\":\"longitude\"},\n        {\"colIndex\":3,\"colType\":\"Integer\",\"colName\":\"loading\"},\n        {\"colIndex\":4,\"colType\":\"String\",\"colName\":\"line_status\"}\n   ]\n}"
+     },
+     {
+      "name": "parameters",
+      "type": "CdaParameters",
+      "value": "[]"
+     },
+     {
+      "name": "cdacalculatedcolumns",
+      "type": "CdaCalculatedColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "cdacolumns",
+      "type": "CdaColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "output",
+      "type": "IndexArray",
+      "value": "[]"
+     },
+     {
+      "name": "outputMode",
+      "type": "OutputMode",
+      "value": "include"
+     },
+     {
+      "name": "cacheKeys",
+      "type": "CacheKeysValues",
+      "value": "[]"
+     },
+     {
+      "name": "cacheDuration",
+      "type": "Integer",
+      "value": 3600
+     },
+     {
+      "name": "cache",
+      "type": "Boolean",
+      "value": "true"
+     }
+    ],
+    "rowName": "jsonScriptable over scripting",
+    "type": "ComponentsjsonScriptable_scripting",
+    "typeDesc": "jsonScriptable over scripting"
+   }
+  ]
+ },
+ "filename": "/public/NMC-samples/rail_stations.cdfde",
+ "layout": {
+  "rows": [
+   {
+    "id": "ecc88716-1164-e967-6f4e-04e97d321bee",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "tootipCSS"
+     },
+     {
+      "name": "resourceCode",
+      "type": "Resource",
+      "value": "#popupObj {\n position:absolute;\n background:white;\n z-Index:1000;\n padding:5px;\n border-radius:5px;\n border: 1px solid grey;\n display: none;\n} "
+     },
+     {
+      "name": "resourceType",
+      "type": "Label",
+      "value": "Css"
+     }
+    ],
+    "type": "LayoutResourceCode",
+    "typeDesc": "Resource"
+   },
+   {
+    "id": "add4affb-f033-59a6-d0e5-36b416aa3c49",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "maps"
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "129dc734-1327-13cb-bf6f-4485909171ed",
+    "parent": "add4affb-f033-59a6-d0e5-36b416aa3c49",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapDynObj"
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "12"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": "500"
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "8384218e-6a4b-78c3-80fb-f5656a78ffd9",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "popupObj"
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "5da32b1f-1fba-b839-356f-e2c2279aaf2c",
+    "parent": "8384218e-6a4b-78c3-80fb-f5656a78ffd9",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "12"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": 300
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   },
+   {
+    "id": "86ae023b-7441-447e-5763-c1f1ef7ceb64",
+    "parent": "5da32b1f-1fba-b839-356f-e2c2279aaf2c",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": ""
+     },
+     {
+      "name": "html",
+      "type": "Html",
+      "value": "a "
+     },
+     {
+      "name": "fontSize",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "color",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutHtml",
+    "typeDesc": "Html"
+   }
+  ],
+  "title": "CDF - Sample structure"
+ }
+}

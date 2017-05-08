@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDADescriptor>
+   <DataSources>
+      <Connection id="mapDS" type="kettle.TransFromFile">
+         <KtrFile>resources/ktr/getLastShipPos.ktr</KtrFile>
+         <variables datarow-name="index" variable-name="index"/>
+      </Connection>
+      <Connection id="stationDS" type="scripting.scripting">
+         <Initscript/>
+         <Language>beanshell</Language>
+      </Connection>
+   </DataSources>
+   <DataAccess access="public" connection="mapDS" id="mapDS" type="kettle">
+      <Name>mapDS</Name>
+      <Cache duration="3600" enabled="false"/>
+      <Columns/>
+      <Parameters>
+         <Parameter default="" name="index" type="Integer"/>
+      </Parameters>
+      <Query><![CDATA[output]]></Query>
+   </DataAccess>
+   <DataAccess access="public" connection="stationDS" id="stationDS" type="jsonScriptable">
+      <Name>stationDS</Name>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters/>
+      <Query><![CDATA[{
+   "resultset":[
+        ["station1", 51.500942, -0.126343, 10, ""],	
+        ["station2", 51.432501, -1.203003, 50, "ok"],
+        ["station3", 51.226560, -2.246704, 30, "ok"],
+        ["station4", 51.095653, -2.713623, 40, "late"],
+        ["station5", 50.988584, -3.004761, 90, "late"],
+        ["station6", 50.888199, -3.043213, 95, "late"],
+        ["station7", 50.891665, -3.218994, 100, "ok"],
+        ["station8", 50.818842, -3.268433, 15, "late"]    
+   ],
+
+   "metadata":[
+        {"colIndex":0,"colType":"String","colName":"id"},
+        {"colIndex":1,"colType":"Numeric","colName":"latitude"},
+        {"colIndex":2,"colType":"Numeric","colName":"longitude"},
+        {"colIndex":3,"colType":"Integer","colName":"loading"},
+        {"colIndex":4,"colType":"String","colName":"line_status"}
+   ]
+}]]></Query>
+   </DataAccess>
+</CDADescriptor>

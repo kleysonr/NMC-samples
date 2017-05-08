@@ -1,0 +1,525 @@
+{
+ "components": {
+  "rows": [
+   {
+    "id": "CUSTOMCOMPONENTS",
+    "name": "Custom",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "Custom"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "fd1f422a-ebf3-0fc0-d95d-4c0b12b6456e",
+    "parent": "CUSTOMCOMPONENTS",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapMarkers"
+     },
+     {
+      "name": "parameter",
+      "type": "Parameter",
+      "value": "${p:mapSelectionParam}"
+     },
+     {
+      "name": "listeners",
+      "type": "Listeners",
+      "value": "[]"
+     },
+     {
+      "name": "API_KEY",
+      "type": "String",
+      "value": "0"
+     },
+     {
+      "name": "centerLatitude",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "centerLongitude",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "cggGraphParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "colormap",
+      "type": "Array",
+      "value": "[]"
+     },
+     {
+      "name": "defaultZoomLevel",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "fillOpacity",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "locationResolver",
+      "type": "locationResolverCustom",
+      "value": "openstreetmap"
+     },
+     {
+      "name": "mapEngineType",
+      "type": "mapEngineTypeCustom",
+      "value": "openlayers"
+     },
+     {
+      "name": "mapMode",
+      "type": "mapModeCustom",
+      "value": "markers"
+     },
+     {
+      "name": "marker",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerCggGraph",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "markerClickFunction",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "markerHeight",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "markerWidth",
+      "type": "Integer",
+      "value": 25
+     },
+     {
+      "name": "parameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupContentsDiv",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "popupHeight",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "popupParameters",
+      "type": "ValuesArray",
+      "value": "[]"
+     },
+     {
+      "name": "popupWidth",
+      "type": "Integer",
+      "value": 250
+     },
+     {
+      "name": "shapeSource",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeColor",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "strokeWidth",
+      "type": "Float",
+      "value": ""
+     },
+     {
+      "name": "tilesets",
+      "type": "tilesetsCustom",
+      "value": "default"
+     },
+     {
+      "name": "dataSource",
+      "type": "Datasource",
+      "value": "southAmericaDS"
+     },
+     {
+      "name": "priority",
+      "type": "Integer",
+      "value": 5
+     },
+     {
+      "name": "htmlObject",
+      "type": "HtmlObject",
+      "value": "${h:mapMarkersObj}"
+     },
+     {
+      "name": "executeAtStart",
+      "type": "Boolean",
+      "value": "true"
+     },
+     {
+      "name": "preExecution",
+      "type": "JavaScript",
+      "value": "function(){\n    \n    var myself = this;\n    \n    // Set the new addIn to be used for the markers\n    myself.markerImageGetter = \"templateIcon\";\n    \n    /*\n    *\n    * The NMC needs to know what columns in the resultset define\n    * the id, that will be matched with the mapDefinition, what\n    * column represents the size of the marker and what column \n    * represents the value used to match the color.\n    *\n    * There are two ways to do that.\n    *   1 - Have three columns the in resultset called id, fill and r.\n    *   2 - Use the visualRoles to set which columns (base 0) represent the id, fill and r values.\n    *\n    */\n    \n    this.visualRoles = {\n        id: 0,\n        r: 1\n    };\n    \n    /*\n    *\n    * Set Min and Max size (pixel) for the markers based on the r values\n    *\n    */\n    \n    this.scales.r = [0.25, 1];\n    \n    /*\n    *\n    * Configure a handler for marker mouseover\n    *\n    * To access data from resultset use: e.data\n    * To access attributes from geoJson use: e.feature.data\n    *\n    */\n    \n    this.off(\"marker:mouseover\").on(\"marker:mouseover\", function(e){\n       \n        $('#labelMarkersObj').html(e.data.country_name + ': ' + e.data.population);\n        \n    });\n    \n    this.off(\"marker:mouseout\").on(\"marker:mouseout\", function(e){\n       \n        $('#labelMarkersObj').html('');\n        \n    });\n\n    /*\n    *\n    * Configure a handler for marker click\n    *\n    * To access data from resultset use: e.data\n    * To access attributes from geoJson use: e.feature.data\n    *\n    */\n\n    this.off(\"marker:click\").on(\"marker:click\", function(e){\n       \n        alert(e.data.contry_name + ': ' + e.data.population);\n        \n    });\n    \n    /*\n    *\n    * If defined a click event, change the cursor\n    *\n    */\n    \n    this.styleMap = {\n            markers: {\n                cursor: \"pointer\",\n                hover: {\n                    fill: \"blue\"\n                }\n            }\n    };  \n\n\n} \n "
+     },
+     {
+      "name": "postExecution",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "postFetch",
+      "type": "JavaScript",
+      "value": "function(data) {\n\n    var myself = this;\n    \n    //var a = $(\"#svgTst\");\n    //a.html(template.icon);\n    \n    var util = {\n        component: myself,\n        data: data\n    }\n    \n    myself.setAddInOptions(\"MarkerImage\", \"templateIcon\", {\n        width: 36,               // can be a function(st, opt, viewModel)\n        height: 36,              // can be a function(st, opt, viewModel)\n        template: template.icon, // can be a function(st, opt, viewModel)\n        util: util,\n        viewModel: function(st, opt){\n            return {\n                id: st.data[opt.util.component.mapping.id],\n                country: st.data[opt.util.component.mapping.contry_name]\n            }\n        },\n        formatterx: function(st, opt, svgObj) {\n\n            // Get Viewport size\n            var w = parseFloat(svgObj.attr().width);\n            var h = parseFloat(svgObj.attr().height);\n\n            // Get marker ID\n            var iconID = st.data[opt.util.component.mapping.id];\n            \n            // Select people icon\n            var el = svgObj.select(\"#idxpto\");\n            \n            // Set a new color to the people icon\n            el.attr({\n                fill: st.styleMap.fill\n            });\n            \n            // Scale factor calculated by the component\n            var scaleFactor = st.styleMap.r;\n            \n            var t = new Snap.Matrix().scale(scaleFactor, scaleFactor, el.getBBox().cx, (h/2)+(el.getBBox().cy)-10);\n            el.transform(t);          \n          \n            // Center the label\n            var label = svgObj.select(\"#tidxpto\");\n            label.transform(new Snap.Matrix().translate((w/2)-(label.getBBox().cx), 0));\n\n            return svgObj;\n        }\n    });\n    \n    return data;    \n    \n} "
+     },
+     {
+      "name": "preChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "postChange",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "tooltip",
+      "type": "Html",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseClick",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOut",
+      "type": "JavaScript",
+      "value": ""
+     },
+     {
+      "name": "shapeMouseOver",
+      "type": "JavaScript",
+      "value": ""
+     }
+    ],
+    "rowName": "NewMapComponent",
+    "type": "ComponentsNewMapComponent",
+    "typeDesc": "Map Component"
+   },
+   {
+    "id": "GENERIC",
+    "name": "Generic",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "Generic"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "cf9878a7-5002-4afa-e265-08079956c5e2",
+    "parent": "GENERIC",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapSelectionParam"
+     },
+     {
+      "name": "javaScript",
+      "type": "JavaScript",
+      "value": "[] "
+     },
+     {
+      "name": "parameterViewRole",
+      "type": "parameterViewRoleCustom",
+      "value": "unused"
+     },
+     {
+      "name": "bookmarkable",
+      "type": "Boolean",
+      "value": "false"
+     },
+     {
+      "name": "public",
+      "type": "Boolean",
+      "value": "false"
+     }
+    ],
+    "rowName": "Custom Parameter",
+    "type": "ComponentsJavascriptParameter",
+    "typeDesc": "Custom parameter"
+   }
+  ]
+ },
+ "datasources": {
+  "rows": [
+   {
+    "id": "SCRIPTING",
+    "name": "SCRIPTING Queries",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "Group",
+      "type": "Label",
+      "value": "SCRIPTING Queries"
+     }
+    ],
+    "type": "Label",
+    "typeDesc": "<i>Group</i>"
+   },
+   {
+    "id": "eb305374-3e54-4215-a6d7-40db10eb4044",
+    "meta": "CDA",
+    "meta_conntype": "scripting.scripting",
+    "meta_datype": "jsonScriptable",
+    "parent": "SCRIPTING",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "southAmericaDS"
+     },
+     {
+      "name": "initscript",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "language",
+      "type": "String",
+      "value": "beanshell"
+     },
+     {
+      "name": "access",
+      "type": "Access",
+      "value": "public"
+     },
+     {
+      "name": "query",
+      "type": "JsonScriptableQuery",
+      "value": "{\n   \"resultset\":[\n      [\"BRA\", 202656784, -14.235004, -51.92528, \"Brazil\"],\n      [\"PER\", 30147936, -9.189967, -75.015152, \"Peru\"],\n      [\"BOL\", 10631486, -16.290154, -63.588653, \"Bolivia\"],\n      [\"COL\", 46245296, 4.570868, -74.297333, \"Colombia\"],\n      [\"VEN\", 28868486, 6.42375, -66.58973, \"Venezuela\"],\n      [\"ECU\", 15654411, -1.831239, -78.183406, \"Ecuador\"],\n      [\"GUY\", 735554, 4.860416, -58.93018, \"Guyana\"],\n      [\"PRY\", 6703860, -23.442503, -58.443832, \"Paraguay\"],\n      [\"SUR\", 573311, 3.919305, -56.027783, \"Suriname\"],\n      [\"URY\", 3332972, -32.522779, -55.765835, \"Uruguay\"],\n      [\"ARG\", 43024376, -38.416097, -63.616672, \"Argentina\"],\n      [\"CHL\", 17363894, -35.675147, -71.542969, \"Chile\"]\n   ],\n\n   \"metadata\":[\n      {\"colIndex\":0,\"colType\":\"String\",\"colName\":\"contry_abbrev\"},\n      {\"colIndex\":1,\"colType\":\"Integer\",\"colName\":\"population\"},\n      {\"colIndex\":2,\"colType\":\"Numeric\",\"colName\":\"latitude\"},\n      {\"colIndex\":3,\"colType\":\"Numeric\",\"colName\":\"longitude\"},\n      {\"colIndex\":0,\"colType\":\"String\",\"colName\":\"contry_name\"},\n   ]\n}"
+     },
+     {
+      "name": "parameters",
+      "type": "CdaParameters",
+      "value": "[]"
+     },
+     {
+      "name": "cdacalculatedcolumns",
+      "type": "CdaCalculatedColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "cdacolumns",
+      "type": "CdaColumnsArray",
+      "value": "[]"
+     },
+     {
+      "name": "output",
+      "type": "IndexArray",
+      "value": "[]"
+     },
+     {
+      "name": "outputMode",
+      "type": "OutputMode",
+      "value": "include"
+     },
+     {
+      "name": "cacheKeys",
+      "type": "CacheKeysValues",
+      "value": "[]"
+     },
+     {
+      "name": "cacheDuration",
+      "type": "Integer",
+      "value": 3600
+     },
+     {
+      "name": "cache",
+      "type": "Boolean",
+      "value": "true"
+     }
+    ],
+    "rowName": "jsonScriptable over scripting",
+    "type": "ComponentsjsonScriptable_scripting",
+    "typeDesc": "jsonScriptable over scripting"
+   }
+  ]
+ },
+ "filename": "/public/NMC-samples/svg_template2.cdfde",
+ "layout": {
+  "rows": [
+   {
+    "id": "e87bd6b9-c35f-5ace-01df-56cc8f434432",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "addIn"
+     },
+     {
+      "name": "resourceFile",
+      "type": "ResourceFile",
+      "value": "${solution:resources/js/templateIconAddIn.js}"
+     },
+     {
+      "name": "resourceType",
+      "type": "Label",
+      "value": "Javascript"
+     }
+    ],
+    "type": "LayoutResourceFile",
+    "typeDesc": "Resource"
+   },
+   {
+    "id": "ca05d3c2-6014-5fbf-60eb-85b18c85ddda",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "template"
+     },
+     {
+      "name": "resourceFile",
+      "type": "ResourceFile",
+      "value": "${solution:resources/js/loadSnowflakeIconSvgTemplate.js}"
+     },
+     {
+      "name": "resourceType",
+      "type": "Label",
+      "value": "Javascript"
+     }
+    ],
+    "type": "LayoutResourceFile",
+    "typeDesc": "Resource"
+   },
+   {
+    "id": "add4affb-f033-59a6-d0e5-36b416aa3c49",
+    "parent": "UnIqEiD",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "maps"
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": ""
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutRow",
+    "typeDesc": "Row"
+   },
+   {
+    "id": "129dc734-1327-13cb-bf6f-4485909171ed",
+    "parent": "add4affb-f033-59a6-d0e5-36b416aa3c49",
+    "properties": [
+     {
+      "name": "name",
+      "type": "Id",
+      "value": "mapMarkersObj"
+     },
+     {
+      "name": "bootstrapExtraSmall",
+      "type": "String",
+      "value": "12"
+     },
+     {
+      "name": "bootstrapSmall",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapMedium",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapLarge",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "bootstrapCssClass",
+      "type": "String",
+      "value": ""
+     },
+     {
+      "name": "height",
+      "type": "Integer",
+      "value": "800"
+     },
+     {
+      "name": "backgroundColor",
+      "type": "Color",
+      "value": ""
+     },
+     {
+      "name": "roundCorners",
+      "type": "RoundCorners",
+      "value": ""
+     },
+     {
+      "name": "textAlign",
+      "type": "TextAlign",
+      "value": ""
+     },
+     {
+      "name": "cssClass",
+      "type": "String",
+      "value": ""
+     }
+    ],
+    "type": "LayoutBootstrapColumn",
+    "typeDesc": "Column"
+   }
+  ],
+  "title": "CDF - Sample structure"
+ }
+}

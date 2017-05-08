@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CDADescriptor>
+   <DataSources>
+      <Connection id="southAmericaDS" type="scripting.scripting">
+         <Initscript/>
+         <Language>beanshell</Language>
+      </Connection>
+   </DataSources>
+   <DataAccess access="public" connection="southAmericaDS" id="southAmericaDS"
+               type="jsonScriptable">
+      <Name>southAmericaDS</Name>
+      <Cache duration="3600" enabled="true"/>
+      <Columns/>
+      <Parameters/>
+      <Query><![CDATA[{
+   "resultset":[
+      ["BRA", 202656784, -14.235004, -51.92528, "Brazil"],
+      ["PER", 30147936, -9.189967, -75.015152, "Peru"],
+      ["BOL", 10631486, -16.290154, -63.588653, "Bolivia"],
+      ["COL", 46245296, 4.570868, -74.297333, "Colombia"],
+      ["VEN", 28868486, 6.42375, -66.58973, "Venezuela"],
+      ["ECU", 15654411, -1.831239, -78.183406, "Ecuador"],
+      ["GUY", 735554, 4.860416, -58.93018, "Guyana"],
+      ["PRY", 6703860, -23.442503, -58.443832, "Paraguay"],
+      ["SUR", 573311, 3.919305, -56.027783, "Suriname"],
+      ["URY", 3332972, -32.522779, -55.765835, "Uruguay"],
+      ["ARG", 43024376, -38.416097, -63.616672, "Argentina"],
+      ["CHL", 17363894, -35.675147, -71.542969, "Chile"]
+   ],
+
+   "metadata":[
+      {"colIndex":0,"colType":"String","colName":"contry_abbrev"},
+      {"colIndex":1,"colType":"Integer","colName":"population"},
+      {"colIndex":2,"colType":"Numeric","colName":"latitude"},
+      {"colIndex":3,"colType":"Numeric","colName":"longitude"},
+      {"colIndex":0,"colType":"String","colName":"contry_name"},
+   ]
+}]]></Query>
+   </DataAccess>
+</CDADescriptor>
