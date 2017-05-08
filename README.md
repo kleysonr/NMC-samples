@@ -16,6 +16,8 @@ How to install
 
 Download the project and upload it into the Pentaho BA Server.
 
+Make sure that you have the following path on the Browser Files: /Public/NMC-Samples
+
 ----------
 
 Samples available
@@ -34,3 +36,7 @@ Samples available
 - **Custom Feature Attribute - FillColor** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A customized function to set a different color for the feature.
 
 - **Near Real Time** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ships moving based on new GPS location.
+
+- **Rail Station** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Show markers and lines representing the stations and the railway.
+
+- **SVG Template** &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Uses a svg icon as the marker image.
